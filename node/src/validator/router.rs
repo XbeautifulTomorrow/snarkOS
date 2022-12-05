@@ -26,6 +26,7 @@ use snarkos_node_messages::{
     MessageCodec,
     Ping,
     Pong,
+    PoolRegisterResponse,
     UnconfirmedTransaction,
 };
 use snarkos_node_tcp::{Connection, ConnectionSide, Tcp};
@@ -179,6 +180,13 @@ impl<N: Network, C: ConsensusStorage<N>> Inbound<N> for Validator<N, C> {
             }
         });
         true
+    }
+
+    /// store the peer ip as pool address and send `PoolRegisterResponse` to the peer
+    fn pool_register_request(&self, ip: SocketAddr) {
+        self.router.insert_pool_ip(ip);
+        let msg = Message::PoolRegisterResponse(PoolRegisterResponse(true));
+        self.send(ip, msg);
     }
 
     /// Retrieves the latest epoch challenge and latest block header, and returns the puzzle response to the peer.

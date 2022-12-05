@@ -67,7 +67,11 @@ pub use puzzle_response::PuzzleResponse;
 mod unconfirmed_solution;
 pub use unconfirmed_solution::UnconfirmedSolution;
 
+mod pool_message;
 mod unconfirmed_transaction;
+
+pub use pool_message::{PoolRegisterRequest, PoolRegisterResponse, PoolUpdateBlockHeight};
+
 pub use unconfirmed_transaction::UnconfirmedTransaction;
 
 use snarkvm::prelude::{
@@ -124,6 +128,9 @@ pub enum Message<N: Network> {
     PuzzleResponse(PuzzleResponse<N>),
     UnconfirmedSolution(UnconfirmedSolution<N>),
     UnconfirmedTransaction(UnconfirmedTransaction<N>),
+    PoolRegisterRequest(PoolRegisterRequest),
+    PoolRegisterResponse(PoolRegisterResponse),
+    PoolUpdateBlockHeight(PoolUpdateBlockHeight),
 }
 
 impl<N: Network> Message<N> {
@@ -150,6 +157,9 @@ impl<N: Network> Message<N> {
             Self::PuzzleResponse(message) => message.name(),
             Self::UnconfirmedSolution(message) => message.name(),
             Self::UnconfirmedTransaction(message) => message.name(),
+            Self::PoolRegisterRequest(message) => message.name(),
+            Self::PoolRegisterResponse(message) => message.name(),
+            Self::PoolUpdateBlockHeight(message) => message.name(),
         }
     }
 
@@ -173,6 +183,9 @@ impl<N: Network> Message<N> {
             Self::PuzzleResponse(..) => 13,
             Self::UnconfirmedSolution(..) => 14,
             Self::UnconfirmedTransaction(..) => 15,
+            Self::PoolRegisterRequest(..) => 30,
+            Self::PoolRegisterResponse(..) => 31,
+            Self::PoolUpdateBlockHeight(..) => 32,
         }
     }
 
@@ -198,6 +211,9 @@ impl<N: Network> Message<N> {
             Self::PuzzleResponse(message) => message.serialize(writer),
             Self::UnconfirmedSolution(message) => message.serialize(writer),
             Self::UnconfirmedTransaction(message) => message.serialize(writer),
+            Self::PoolRegisterRequest(message) => message.serialize(writer),
+            Self::PoolRegisterResponse(message) => message.serialize(writer),
+            Self::PoolUpdateBlockHeight(message) => message.serialize(writer),
         }
     }
 
@@ -230,6 +246,9 @@ impl<N: Network> Message<N> {
             13 => Self::PuzzleResponse(MessageTrait::deserialize(bytes)?),
             14 => Self::UnconfirmedSolution(MessageTrait::deserialize(bytes)?),
             15 => Self::UnconfirmedTransaction(MessageTrait::deserialize(bytes)?),
+            30 => Self::PoolRegisterRequest(MessageTrait::deserialize(bytes)?),
+            31 => Self::PoolRegisterResponse(MessageTrait::deserialize(bytes)?),
+            32 => Self::PoolUpdateBlockHeight(MessageTrait::deserialize(bytes)?),
             _ => bail!("Unknown message ID {id}"),
         };
 

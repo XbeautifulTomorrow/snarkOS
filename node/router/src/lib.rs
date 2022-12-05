@@ -75,6 +75,8 @@ pub struct Router<N: Network> {
     candidate_peers: Arc<RwLock<IndexSet<SocketAddr>>>,
     /// The set of restricted peer IPs.
     restricted_peers: Arc<RwLock<IndexMap<SocketAddr, Instant>>>,
+    /// The set of pools
+    restricted_pools: Arc<RwLock<IndexSet<SocketAddr>>>,
     /// The spawned handles.
     handles: Arc<RwLock<Vec<JoinHandle<()>>>>,
     /// The boolean flag for the development mode.
@@ -118,6 +120,7 @@ impl<N: Network> Router<N> {
             connected_peers: Default::default(),
             candidate_peers: Default::default(),
             restricted_peers: Default::default(),
+            restricted_pools: Default::default(),
             handles: Default::default(),
             is_dev,
         })
@@ -204,6 +207,18 @@ impl<N: Network> Router<N> {
     /// Returns the (ambiguous) peer address from the listener IP address.
     pub fn resolve_to_ambiguous(&self, peer_ip: &SocketAddr) -> Option<SocketAddr> {
         self.resolver.get_ambiguous(peer_ip)
+    }
+
+    /// insert pool ip
+    pub fn insert_pool_ip(&self, ip: SocketAddr) {
+        let mut pool_ips = self.restricted_pools.write();
+        pool_ips.insert(ip);
+    }
+
+    /// get pool ip list
+    pub fn pool_ips(&self) -> Vec<SocketAddr> {
+        let pool_ips = self.restricted_pools.read();
+        pool_ips.iter().filter(|ip| self.is_connected(ip)).cloned().collect()
     }
 
     /// Returns `true` if the node is connected to the given peer IP.

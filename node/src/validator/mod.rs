@@ -20,7 +20,14 @@ use crate::traits::NodeInterface;
 use snarkos_account::Account;
 use snarkos_node_consensus::Consensus;
 use snarkos_node_ledger::Ledger;
-use snarkos_node_messages::{BlockRequest, Message, NodeType, PuzzleResponse, UnconfirmedSolution};
+use snarkos_node_messages::{
+    BlockRequest,
+    Message,
+    NodeType,
+    PoolUpdateBlockHeight,
+    PuzzleResponse,
+    UnconfirmedSolution,
+};
 use snarkos_node_rest::Rest;
 use snarkos_node_router::{Heartbeat, Inbound, Outbound, Router, Routing};
 use snarkos_node_tcp::{
@@ -238,6 +245,15 @@ impl<N: Network, C: ConsensusStorage<N>> Validator<N, C> {
             self.router.sync().insert_canon_locator(block.height(), block.hash());
             // Increment the latest height.
             current_height += 1;
+
+            // notify pools
+            info!("notify pools that blockheight changed");
+            let pool_ips = self.router.pool_ips();
+            for ip in pool_ips {
+                info!("notify pool {:?}", ip);
+                let msg = PoolUpdateBlockHeight(block.height());
+                self.send(ip, Message::PoolUpdateBlockHeight(msg));
+            }
         }
     }
 }

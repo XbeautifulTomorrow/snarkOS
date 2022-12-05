@@ -267,6 +267,12 @@ pub trait Inbound<N: Network>: Reading + Outbound<N> {
                     false => bail!("Peer '{peer_ip}' sent an invalid unconfirmed transaction"),
                 }
             }
+            Message::PoolRegisterRequest(_message) => {
+                warn!("get pool register request: {:?}", peer_ip);
+                self.pool_register_request(peer_ip);
+                Ok(())
+            }
+            _ => Ok(()),
         }
     }
 
@@ -386,6 +392,9 @@ pub trait Inbound<N: Network>: Reading + Outbound<N> {
 
     /// Handles a `PuzzleResponse` message.
     fn puzzle_response(&self, peer_ip: SocketAddr, _serialized: PuzzleResponse<N>, _header: Header<N>) -> bool;
+
+    /// register the pool ip
+    fn pool_register_request(&self, _peer_ip: SocketAddr) {}
 
     /// Handles an `UnconfirmedSolution` message.
     async fn unconfirmed_solution(
