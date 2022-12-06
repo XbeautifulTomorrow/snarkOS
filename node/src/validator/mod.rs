@@ -20,13 +20,7 @@ use crate::traits::NodeInterface;
 use snarkos_account::Account;
 use snarkos_node_consensus::Consensus;
 use snarkos_node_ledger::Ledger;
-use snarkos_node_messages::{
-    BlockRequest,
-    Message,
-    NodeType,
-    PuzzleResponse,
-    UnconfirmedSolution,
-};
+use snarkos_node_messages::{BlockRequest, Message, NodeType, PuzzleResponse, UnconfirmedSolution};
 use snarkos_node_rest::Rest;
 use snarkos_node_router::{Heartbeat, Inbound, Outbound, Router, Routing};
 use snarkos_node_tcp::{
