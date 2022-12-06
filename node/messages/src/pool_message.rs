@@ -73,32 +73,3 @@ impl MessageTrait for PoolRegisterResponse {
         Ok(s)
     }
 }
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PoolUpdateBlockHeight(pub u32);
-
-impl MessageTrait for PoolUpdateBlockHeight {
-    /// Returns the message name.
-    #[inline]
-    fn name(&self) -> String {
-        "PoolUpdateBlockHeight".to_string()
-    }
-
-    /// Serializes the message into the buffer.
-    #[inline]
-    fn serialize<W: Write>(&self, writer: &mut W) -> Result<()> {
-        writer.write_all(&self.0.to_le_bytes()[..])?;
-        Ok(())
-    }
-
-    /// Deserializes the given buffer into a message.
-    #[inline]
-    fn deserialize(mut bytes: BytesMut) -> Result<Self> {
-        // Make sure a byte for the fork flag is available.
-        if bytes.remaining() == 0 {
-            bail!("Missing fork flag in a 'Pong'");
-        }
-        let block_height: u32 = bytes.get_u32_le();
-        Ok(Self(block_height))
-    }
-}

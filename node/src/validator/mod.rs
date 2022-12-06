@@ -24,7 +24,6 @@ use snarkos_node_messages::{
     BlockRequest,
     Message,
     NodeType,
-    PoolUpdateBlockHeight,
     PuzzleResponse,
     UnconfirmedSolution,
 };
@@ -250,9 +249,9 @@ impl<N: Network, C: ConsensusStorage<N>> Validator<N, C> {
             info!("notify pools that blockheight changed");
             let pool_ips = self.router.pool_ips();
             for ip in pool_ips {
-                info!("notify pool {:?}", ip);
-                let msg = PoolUpdateBlockHeight(block.height());
-                self.send(ip, Message::PoolUpdateBlockHeight(msg));
+                info!("notify pool puzzle response {:?}", ip);
+                // send puzzle response
+                self.puzzle_request(ip);
             }
         }
     }
